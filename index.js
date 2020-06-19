@@ -6,17 +6,39 @@ const connect = mongoose.connect(url);
 
 connect.then((db)=>{
     console.log('Connected successfully to DB');
-
-    Dishes.create({
-        name : 'Uthappizza',
-        description : 'Test'
+    Dishes.remove({})
+    .then(()=>{
+        return Dishes.create({
+            name : 'Uthappizza2',
+            description : 'Test1'
+        })
     })
+    
         .then((dish)=>{
             console.log(dish);
-            return Dishes.find({}).exec();
+            return Dishes.findByIdAndUpdate(dish._id,{
+                $set: {
+                    name: "Uthapp", 
+                    description : 'Updated test'
+                }
+            },
+            //  new will give us the updated dish
+             { new : true }     
+            ).exec();
         })
-        .then((dishes)=>{
-            console.log(dishes);
+        .then((dish)=>{
+            console.log(dish);
+            dish.comment.push({
+                rating: 5,
+                comment: 'I\'m getting sinking feeling',
+                author: 'Motasim'
+            });
+
+            return dish.save();
+        })
+        .then((dish)=>{
+            console.log(dish);    
+
             return Dishes.remove({});
         })
         .then(()=>{
